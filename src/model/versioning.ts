@@ -13,6 +13,12 @@ export default class Versioning {
     return '^v?([0-9]+\\.)*[0-9]+.*';
   }
 
+  static get grepCompatibleInputVersionGlob() {
+    // This is not the same as the regex above, but allows to match all
+    // the tags that are compatible with the regex... and some that are not.
+    return '[v0-9]?[0-9]*';
+  }
+
   /**
    * Get the branch name of the (related) branch
    */
@@ -207,7 +213,10 @@ export default class Versioning {
    * identifies the current commit.
    */
   static async getVersionDescription() {
-    return this.git(['describe', '--long', '--tags', '--always', 'HEAD']);
+    // By using "--match" parameter and the regex the command will discard tags that are not
+    // compatible with the format. This way we can use tags for other purposes in the repository
+    // without breaking semantic versioning.
+    return this.git(['describe', '--long', '--tags', '--always', '--match', `${this.grepCompatibleInputVersionGlob}`]);
   }
 
   /**
@@ -263,6 +272,6 @@ export default class Versioning {
    * Run git in the specified project path
    */
   static async git(arguments_: string[], options = {}) {
-    return System.run('git', arguments_, { cwd: Input.projectPath, ...options }, false);
+    return System.run('git', arguments_, { cwd: Input.projectPath, ...options }, true);
   }
 }

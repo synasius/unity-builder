@@ -156,7 +156,7 @@ class BuildParameters {
       buildPath: `${Input.buildsPath}/${Input.targetPlatform}`,
       buildFile,
       buildMethod: Input.buildMethod,
-      buildVersion,
+      buildVersion: `${buildVersion}-${Input.gitSha.slice(0, 11)}`,
       manualExit: Input.manualExit,
       enableGpu: Input.enableGpu,
       androidVersionCode,
